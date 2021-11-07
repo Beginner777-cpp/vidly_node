@@ -1,70 +1,76 @@
-const express = require('express');
-const Joi = require('joi');
-
+const express = require("express");
+const Joi = require("joi");
+const db = require("../models/genreDb");
+const mongoose = require("mongoose");
 const router = express.Router();
-const genres = [
-    { id: 1, name: 'action' },
-    { id: 2, name: 'comedy' },
-    { id: 3, name: 'drama' },
-    { id: 4, name: 'thriller' },
-];
 
-
-router.get('/', (req, res) => {
-    res.send(genres)
-})
-router.get('/:id', (req, res) => {
-    const genre = genres.find(g => g.id === parseInt(req.params.id))
+router.get("/", async (req, res) => {
+  try {
+    const genres = await db.getGenres();
+    res.send(genres);
+  } catch (error) {
+    res.send(400).send(error.message);
+  }
+});
+router.get("/:id", async (req, res) => {
+  try {
+    const genre = await db.getGenreById(req.params.id);
     if (!genre) {
-        return res.status(404).send('Genre with given ID was not found')
+      return res.status(404).send("Genre with given ID was not found");
     }
-    res.send(genre)
-})
-router.post('/', (req, res) => {
+    res.send(genre);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+router.post("/", async (req, res) => {
+  try {
     const result = validateGenre(req.body);
     if (result.error) {
-        return res.status(400).send(result.error.details[0].message)
+      return res.status(400).send(result.error.details[0].message);
     }
-    const genre = {
-        id: genres.length + 1,
-        name: req.body.name
-    }
-    genres.push(genre);
+    const genre = await db.addGenre(req.body.name);
     res.send(genre);
-})
+  } catch (error) {
+    res.send(400).send(error.message);
+  }
+});
 
-router.put('/:id', (req, res) => {
-    const genre = genres.find(g => g.id === parseInt(req.params.id))
-    if (!genre) {
-        return res.status(404).send('Genre with given ID was not found')
-    }
+router.put("/:id", async (req, res) => {
+  try {
     const result = validateGenre(req.body);
     if (result.error) {
-        return res.status(400).send(result.error.details[0].message)
+      return res.status(400).send(result.error.details[0].message);
     }
-    genre.name = req.body.name;
-
-    res.send(genre);
-})
-
-router.delete('/:id', (req, res) => {
-    const genre = genres.find(g => g.id === parseInt(req.params.id))
+    const genre = await db.editGenre(req.params.id, req.body.name);
     if (!genre) {
-        return res.status(404).send('Genre with given ID was not found')
+      return res.status(404).send("Genre with given ID was not found");
     }
-    const index = genres.indexOf(genre);
-    genres.splice(index, 1);
 
     res.send(genre);
-})
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const genre = await db.removeGenre(req.params.id);
+    if (!genre) {
+      return res.status(404).send("Genre with given ID was not found");
+    }
+
+    res.send(genre);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
 
 function validateGenre(genre) {
-    const schema = Joi.object({
-        name: Joi.string().required().min(3)
-
-    })
-    return schema.validate(genre);
+  const schema = Joi.object({
+    name: Joi.string().required().min(3),
+  });
+  return schema.validate(genre);
 }
 
 module.exports = router;
