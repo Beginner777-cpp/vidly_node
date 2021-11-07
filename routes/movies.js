@@ -1,31 +1,31 @@
 const express = require("express");
 const Joi = require("joi");
-const db = require("../models/genre");
+const db = require("../models/movie");
 const mongoose = require("mongoose");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const genres = await db.getGenres();
-    res.send(genres);
+    const movies = await db.getMovies();
+    res.send(movies);
   } catch (error) {
     res.send(400).send(error.message);
   }
 });
 router.get("/:id", async (req, res) => {
   try {
-    const genre = await db.getGenreById(req.params.id);
-    if (!genre) {
-      return res.status(404).send("Genre with given ID was not found");
+    const movie = await db.getMovieById(req.params.id);
+    if (!movie) {
+      return res.status(404).send("Movie with given ID was not found");
     }
-    res.send(genre);
+    res.send(movie);
   } catch (error) {
     res.status(400).send(error.message);
   }
 });
 router.post("/", async (req, res) => {
   try {
-    const result = validateGenre(req.body);
+    const result = validateMovie(req.body);
     if (result.error) {
       return res.status(400).send(result.error.details[0].message);
     }
@@ -66,11 +66,12 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-function validateGenre(genre) {
+function validateMovie(movie) {
   const schema = Joi.object({
-    name: Joi.string().required().min(3),
+    title: Joi.string().required().min(3),
+
   });
-  return schema.validate(genre);
+  return schema.validate(movie);
 }
 
 module.exports = router;

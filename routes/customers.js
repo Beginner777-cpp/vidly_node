@@ -1,7 +1,7 @@
 const express = require("express");
 const Joi = require("joi");
 const router = express.Router();
-const db = require("../models/customerDb");
+const db = require("../models/customer");
 router.get("/", async (req, res) => {
   try {
     const customers = await db.getCustomers();

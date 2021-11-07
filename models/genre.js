@@ -46,4 +46,5 @@ module.exports = {
   removeGenre,
   editGenre,
   getGenreById,
+  genreSchema
 };
