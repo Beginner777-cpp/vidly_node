@@ -1,25 +1,29 @@
-const { required } = require("joi");
 const mongoose = require("mongoose");
 const { genreSchema } = require("./genre");
 
 const movieSchema = mongoose.Schema({
   title: {
     type: String,
+    trim: true,
     required: true,
     minlength: 3,
-    maxlength: 50,
+    maxlength: 250,
   },
   genre: {
     type: genreSchema,
     required: true,
   },
-  numberInStocks: {
+  numberInStock: {
     type: Number,
     required: true,
+    min: 0,
+    max: 255,
   },
   dailyRentalRate: {
     type: Number,
     required: true,
+    min: 0,
+    max: 255,
   },
 });
 const Movie = mongoose.model("Movie", movieSchema);
@@ -31,9 +35,15 @@ async function getMovieById(id) {
   const movie = await Movie.findById(id);
   return movie;
 }
-async function addMovie(name) {
+async function addMovie(movieInput, genre) {
   let movie = new Movie({
-    name: name,
+    title: movieInput.title,
+    genre: {
+      _id: genre._id,
+      name: genre.name,
+    },
+    numberInStock: movieInput.numberInStock,
+    dailyRentalRate: movieInput.dailyRentalRate,
   });
   movie = await movie.save();
   return movie;
@@ -42,8 +52,20 @@ async function removeMovie(id) {
   const movie = await Movie.findByIdAndRemove(id);
   return movie;
 }
-async function editMovie(id, movieChanged) {
-  const movie = await Movie.findByIdAndUpdate(id, movieChanged, { new: true });
+async function editMovie(id, movieChanged, genre) {
+  const movie = await Movie.findByIdAndUpdate(
+    id,
+    {
+      title: movieChanged.title,
+      genre: {
+        _id: genre._id,
+        name: genre.name,
+      },
+      numberInStock: movieChanged.numberInStock,
+      dailyRentalRate: movieChanged.dailyRentalRate,
+    },
+    { new: true }
+  );
   return movie;
 }
 
@@ -52,5 +74,5 @@ module.exports = {
   addMovie,
   removeMovie,
   editMovie,
-  getMovieById,
+  getMovieById
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const Joi = require("joi");
 const db = require("../models/movie");
+const dbGenre = require("../models/genre");
 const mongoose = require("mongoose");
 const router = express.Router();
 
@@ -29,25 +30,33 @@ router.post("/", async (req, res) => {
     if (result.error) {
       return res.status(400).send(result.error.details[0].message);
     }
-    const genre = await db.addGenre(req.body.name);
-    res.send(genre);
+    const genre = await dbGenre.getGenreById(req.body.genreId);
+    if (!genre) {
+      return res.status(404).send("Genre with given ID was not found");
+    }
+    const movie = await db.addMovie(req.body, genre);
+    return res.send(movie);
   } catch (error) {
-    res.send(400).send(error.message);
+    return res.send(400).send(error);
   }
 });
 
 router.put("/:id", async (req, res) => {
   try {
-    const result = validateGenre(req.body);
+    const result = validateMovie(req.body);
     if (result.error) {
       return res.status(400).send(result.error.details[0].message);
     }
-    const genre = await db.editGenre(req.params.id, req.body.name);
+    const genre = await dbGenre.getGenreById(req.body.genreId);
     if (!genre) {
       return res.status(404).send("Genre with given ID was not found");
     }
+    const movie = await db.editMovie(req.params.id, req.body, genre);
+    if (!movie) {
+      return res.status(404).send("Movie with given ID was not found");
+    }
 
-    res.send(genre);
+    res.send(movie);
   } catch (error) {
     res.status(400).send(error.message);
   }
@@ -55,12 +64,12 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const genre = await db.removeGenre(req.params.id);
-    if (!genre) {
-      return res.status(404).send("Genre with given ID was not found");
+    const movie = await db.removeMovie(req.params.id);
+    if (!movie) {
+      return res.status(404).send("Movie with given ID was not found");
     }
 
-    res.send(genre);
+    res.send(movie);
   } catch (error) {
     res.status(400).send(error.message);
   }
@@ -69,8 +78,11 @@ router.delete("/:id", async (req, res) => {
 function validateMovie(movie) {
   const schema = Joi.object({
     title: Joi.string().required().min(3),
-
+    genreId: Joi.string().required().min(3),
+    numberInStock: Joi.number().required().positive(),
+    dailyRentalRate: Joi.number().required().positive(),
   });
+
   return schema.validate(movie);
 }
 

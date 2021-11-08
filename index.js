@@ -9,9 +9,11 @@ const logger = require("./middleware/logger");
 const genres = require("./routes/genres");
 const home = require("./routes/home");
 const customers = require("./routes/customers");
+const movies = require("./routes/movies");
+const rentals = require("./routes/rentals");
+const { compileClientWithDependenciesTracked } = require("pug");
 const PORT = process.env.PORT || 3000;
 const app = express();
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -25,7 +27,7 @@ if (app.get("env") === "development") {
   startUpDebugger("Morgan enabled");
 }
 
-const connection = mongoose
+mongoose
   .connect("mongodb://localhost/vidly")
   .then(() => console.log("Connected to database..."))
   .catch((err) => console.log(err));
@@ -33,5 +35,7 @@ const connection = mongoose
 app.use("/api/genres", genres);
 app.use("/", home);
 app.use("/api/customers", customers);
+app.use("/api/movies", movies);
+app.use("/api/rentals", rentals);
 
 app.listen(PORT, () => console.log(`Listening to port ${PORT}...`));
