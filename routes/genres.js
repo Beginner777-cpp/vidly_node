@@ -1,12 +1,12 @@
 const express = require("express");
 const Joi = require("joi");
-const db = require("../models/genre");
+const { Genre } = require("../models/genre");
 const mongoose = require("mongoose");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const genres = await db.getGenres();
+    const genres = await Genre.find().sort("name");
     res.send(genres);
   } catch (error) {
     res.send(400).send(error.message);
@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
 });
 router.get("/:id", async (req, res) => {
   try {
-    const genre = await db.getGenreById(req.params.id);
+    const genre = await Genre.findById(req.params.id);
     if (!genre) {
       return res.status(404).send("Genre with given ID was not found");
     }
@@ -29,7 +29,10 @@ router.post("/", async (req, res) => {
     if (result.error) {
       return res.status(400).send(result.error.details[0].message);
     }
-    const genre = await db.addGenre(req.body.name);
+    const genre = new Genre({
+      name: req.body.name,
+    });
+    await genre.save();
     res.send(genre);
   } catch (error) {
     res.send(400).send(error.message);
@@ -42,7 +45,13 @@ router.put("/:id", async (req, res) => {
     if (result.error) {
       return res.status(400).send(result.error.details[0].message);
     }
-    const genre = await db.editGenre(req.params.id, req.body.name);
+    const genre = await Genre.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.name,
+      },
+      { new: true }
+    );
     if (!genre) {
       return res.status(404).send("Genre with given ID was not found");
     }
@@ -55,11 +64,10 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const genre = await db.removeGenre(req.params.id);
+    const genre = await Genre.findByIdAndRemove(req.params.id);
     if (!genre) {
       return res.status(404).send("Genre with given ID was not found");
     }
-
     res.send(genre);
   } catch (error) {
     res.status(400).send(error.message);

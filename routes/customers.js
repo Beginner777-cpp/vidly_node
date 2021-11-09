@@ -1,10 +1,10 @@
 const express = require("express");
 const Joi = require("joi");
 const router = express.Router();
-const db = require("../models/customer");
+const { Customer } = require("../models/customer");
 router.get("/", async (req, res) => {
   try {
-    const customers = await db.getCustomers();
+    const customers = await Customer.find().sort("name");
     res.send(customers);
   } catch (error) {
     res.status(400).send(error.message);
@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
 });
 router.get("/:id", async (req, res) => {
   try {
-    const customer = await db.getCustomerById(req.params.id);
+    const customer = await Customer.findById(req.params.id);
     if (!customer) {
       res.status(404).send("Customer with given ID was not found");
     }
@@ -27,7 +27,8 @@ router.post("/", async (req, res) => {
     if (!result) {
       return res.status(400).send(result.error.details[0].message);
     }
-    const customer = await db.addCustomer(req.body);
+    const customer = new Customer(req.body);
+    await customer.save();
     res.send(customer);
   } catch (error) {
     res.status(400).send(error.message);
@@ -39,7 +40,7 @@ router.put("/:id", async (req, res) => {
     if (!result) {
       return res.status(400).send(result.error.details[0].message);
     }
-    const customer = await db.editCustomer(req.params.id, req.body);
+    const customer = await Customer.findByIdAndUpdate(req.params.id, req.body);
     if (!customer) {
       return res.status(404).send("Сustomer with given ID was not found");
     }
@@ -50,7 +51,7 @@ router.put("/:id", async (req, res) => {
 });
 router.delete("/:id", async (req, res) => {
   try {
-    const customer = await db.removeCustomer(req.params.id);
+    const customer = await Customer.findByIdAndRemove(req.params.id);
     if (!customer) {
       return res.status(404).send("Сustomer with given ID was not found");
     }
