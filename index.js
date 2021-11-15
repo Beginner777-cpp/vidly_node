@@ -14,7 +14,6 @@ const customers = require("./routes/customers");
 const movies = require("./routes/movies");
 const rentals = require("./routes/rentals");
 const users = require('./routes/users');
-const { compileClientWithDependenciesTracked } = require("pug");
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
