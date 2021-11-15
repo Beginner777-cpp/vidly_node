@@ -1,9 +1,10 @@
 const express = require("express");
 const Joi = require("joi");
+const bcrypt = require('bcrypt');
 const { User } = require("../models/user");
 const mongoose = require("mongoose");
 const _ = require("lodash");
-const passwordComplexity = require("joi-password-complexity").default;
+const passwordComplexity = require("joi-password-complexity");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -35,11 +36,15 @@ router.post("/", async (req, res) => {
     if (user) {
       return res.status(400).send("User already registered");
     }
-    user = new User(_.pick(req.body, ["name", "email"]));
+
+
+    user = new User(_.pick(req.body, ["name", "email", "password"]));
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
     await user.save();
-    res.send(_.pick(user, ["_id", "name", "email"]));
+    return res.status(200).send(_.pick(user, ["_id", "name", "email"]));
   } catch (error) {
-    res.send(400).send(error.message);
+    res.status(400).send(error.message);
   }
 });
 
@@ -81,19 +86,6 @@ router.delete("/:id", async (req, res) => {
 });
 
 function validateUser(user) {
-  const schema = Joi.object({
-    name: Joi.string().required().min(3),
-    email: Joi.string().email({
-      minDomainSegments: 2,
-    }),
-    password: new passwordComplexity({min: 7,
-        max: 30,
-        lowerCase: 1,
-        upperCase: 1,
-        numeric: 1,
-        symbol: 1,
-        requirementCount: 2,}).required(),
-  });
   const complexityOptions = {
     min: 7,
     max: 30,
@@ -101,8 +93,16 @@ function validateUser(user) {
     upperCase: 1,
     numeric: 1,
     symbol: 1,
-    requirementCount: 2,
+    requirementCount: 4,
   };
+  const schema = Joi.object({
+    name: Joi.string().required().min(3),
+    email: Joi.string().email({
+      minDomainSegments: 2,
+    }),
+    password: passwordComplexity(complexityOptions).required(),
+  });
+
   return schema.validate(user);
 }
 
