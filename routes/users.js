@@ -1,5 +1,7 @@
 const express = require("express");
 const Joi = require("joi");
+const auth = require('../middleware/auth')
+
 const bcrypt = require('bcrypt');
 const { User } = require("../models/user");
 const mongoose = require("mongoose");
@@ -15,9 +17,9 @@ router.get("/", async (req, res) => {
     res.send(400).send(error.message);
   }
 });
-router.get("/:id", async (req, res) => {
+router.get("/me", auth, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).send("User with given ID was not found");
     }
@@ -42,7 +44,10 @@ router.post("/", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
-    return res.status(200).send(_.pick(user, ["_id", "name", "email"]));
+
+    const token = user.generateAuthToken()
+    res.header('x-auth-token', token).send(_.pick(user, ["_id", "name", "email"]))
+
   } catch (error) {
     res.status(400).send(error.message);
   }
@@ -89,11 +94,11 @@ function validateUser(user) {
   const complexityOptions = {
     min: 7,
     max: 30,
-    lowerCase: 1,
-    upperCase: 1,
+    // lowerCase: 1,
+    // upperCase: 1,
     numeric: 1,
-    symbol: 1,
-    requirementCount: 4,
+    // symbol: 1,
+    requirementCount: 1,
   };
   const schema = Joi.object({
     name: Joi.string().required().min(3),

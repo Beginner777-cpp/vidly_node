@@ -1,7 +1,9 @@
 const express = require("express");
 const Joi = require("joi");
-const { Genre } = require("../models/genre");
 const mongoose = require("mongoose");
+const { Genre } = require("../models/genre");
+const auth = require('../middleware/auth')
+const admin = require('../middleware/admin')
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -23,7 +25,7 @@ router.get("/:id", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   try {
     const result = validateGenre(req.body);
     if (result.error) {
@@ -62,7 +64,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
   try {
     const genre = await Genre.findByIdAndRemove(req.params.id);
     if (!genre) {

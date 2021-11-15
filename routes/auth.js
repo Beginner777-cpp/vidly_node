@@ -1,7 +1,6 @@
 const express = require("express");
 const Joi = require("joi");
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
 const { User } = require("../models/user");
 const _ = require("lodash");
 const router = express.Router();
@@ -22,7 +21,9 @@ router.post("/", async (req, res) => {
         if (!validPassword) {
             return res.status(400).send("Invalid email or password.");
         }
-        res.send(true)
+
+        const token = user.generateAuthToken()
+        res.send(token)
     } catch (error) {
         res.status(400).send(error.message);
     }
