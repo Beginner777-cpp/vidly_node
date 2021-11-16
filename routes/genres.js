@@ -3,16 +3,12 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 const { Genre } = require("../models/genre");
 const auth = require('../middleware/auth')
-const admin = require('../middleware/admin')
+const admin = require('../middleware/admin');
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  try {
-    const genres = await Genre.find().sort("name");
-    res.send(genres);
-  } catch (error) {
-    res.send(400).send(error.message);
-  }
+  const genres = await Genre.find().sort("name");
+  res.send(genres);
 });
 router.get("/:id", async (req, res) => {
   try {
