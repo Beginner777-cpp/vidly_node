@@ -1,0 +1,10 @@
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-19 T 17:20:44"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-19 T 17:53:48"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-19 T 18:1:7"}
+{"level":"error","timestamp":"2021-10-19 T 20:20:7"}
+{"level":"error","message":"Something failed","timestamp":"2021-10-19 T 20:20:43"}
+{"level":"error","message":"This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason \"undefined\".","timestamp":"2021-10-19 T 20:23:2"}
+{"level":"error","message":"","timestamp":"2021-10-19 T 20:23:9"}
+{"level":"error","message":"miserable error.","timestamp":"2021-10-19 T 20:28:15"}
+{"level":"error","message":"miserable error.","timestamp":"2021-10-19 T 20:29:56"}
+{"level":"error","message":"miserable error.","timestamp":"2021-10-19 T 20:30:4"}

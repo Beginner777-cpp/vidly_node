@@ -1,5 +1,6 @@
 require('express-async-errors');
 const winston = require('winston');
+require('winston-mongodb');
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
 const express = require("express");
@@ -21,7 +22,54 @@ const error = require('./middleware/error');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-winston.add(winston.transports.File, {filename: 'logfile.log'});
+// process.on('uncaughtException', (ex) => {
+//   // console.log("uncaughtException");
+//   winston.error(ex.message);
+//   process.exit(1);
+// })
+// winston.ExceptionHandler
+new winston.ExceptionHandler(
+  new winston.transports.File({filename: 'uncaughtException.log'})
+)
+
+process.on('unhandledRejection', (ex) => {
+  // console.log("unhandledRejection");
+  winston.error(ex.message);
+  process.exit(1);
+
+})
+
+
+// winston.add(new winston.transports.File({ filename: 'logfile.log' }), { 'timestamp': true });
+function timezoned() {
+  return `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()} T ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
+}
+winston.add(winston.createLogger({
+  format: winston.format.combine(
+    winston.format.timestamp({ format: timezoned }),
+    winston.format.json()
+  ),
+
+  defaultMeta: { service: 'user-service' },
+  transports: [
+    //
+    // - Write all logs with level `error` and below to `error.log`
+    // - Write all logs with level `info` and below to `combined.log`
+    //
+    new winston.transports.File({ filename: 'logfile.log' }),
+
+  ],
+}));
+
+winston.add(new winston.transports.MongoDB({ db: "mongodb://localhost:27017/vidly", options: { useNewUrlParser: true, useUnifiedTopology: true } }))
+
+
+// throw new Error('Something failed');
+
+// const p = Promise.reject(new Error('miserable error.'));
+
+// p.then(() => console.log('Done'))
+
 
 if (!config.get('jwtPrivateKey')) {
   console.error('FATAL ERROR: jwtPrivateKey is not defined');
