@@ -3,8 +3,8 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 const Fawn = require("fawn");
 const { Rental } = require("../models/rental");
-const dbMovie = require("../models/movie");
-const dbCustomer = require("../models/customer");
+const {Movie} = require("../models/movie");
+const {Customer} = require("../models/customer");
 
 const router = express.Router();
 
@@ -35,16 +35,16 @@ router.post("/", async (req, res) => {
       return res.status(400).send(result.error.details[0].message);
     }
 
-    const customer = await dbCustomer.getCustomerById(req.body.customerId);
+    const customer = await Customer.findById(req.body.customerId);
     if (!customer) {
       return res.status(400).send("Invalid customer.");
     }
-    const movie = await dbMovie.getMovieById(req.body.movieId);
+    const movie = await Movie.findById(req.body.movieId);
     if (!movie) {
       return res.status(400).send("Invalid movie.");
     }
     if (movie.numberInStock === 0) {
-      return res.send(400).send("Movie not in stock.");
+      return res.status(400).send("Movie not in stock.");
     }
     let rental = new Rental({
       customer: customer,
@@ -63,7 +63,7 @@ router.post("/", async (req, res) => {
       res.status(500).send("Something failed.");
     }
   } catch (error) {
-    return res.send(400).send(error);
+    res.status(400).send(error);
   }
 });
 

@@ -1,9 +1,9 @@
 const winston = require('winston');
 
 
-module.exports = function (err, req, res, next) {
+module.exports = async function (err, req, res, next) {
     //winston.log('error', err)
-    winston.error(err.message);
+    await winston.error(err);
     //error
     //warn
     //info

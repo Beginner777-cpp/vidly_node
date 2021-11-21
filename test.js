@@ -29,21 +29,38 @@
 
 
 // function add(fn) {
- 
+
 //     return function(s) {
-   
+
 //       var gg = s + ' is Best';
-   
+
 //       // By concatenating we extend
 //       // the function "add"
 //       fn(gg);
 //     }
 //   }
-   
-  // Decorated function
+
+// Decorated function
 //   function print(s) {
 //     console.log(s);
 //   }
-   
-  // Calling "add"
+
+// Calling "add"
 //   var g = add(print);
+
+const Joi = require('joi');
+Joi.objectId = require("joi-objectid")(Joi);
+function validateRental(rental) {
+  const schema = Joi.object({
+    customerId: Joi.objectId().required(),
+    movieId: Joi.objectId().required(),
+  });
+  console.log(schema.validate(rental));
+
+  return schema.validate(rental);
+}
+
+validateRental({
+  "customerId": "619a0caa2ded1e590a5687c9",
+  "movieId": "619a0c5e2ded1e590a5687ba"
+})

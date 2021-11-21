@@ -8,3 +8,23 @@
 {"level":"error","message":"miserable error.","timestamp":"2021-10-19 T 20:28:15"}
 {"level":"error","message":"miserable error.","timestamp":"2021-10-19 T 20:29:56"}
 {"level":"error","message":"miserable error.","timestamp":"2021-10-19 T 20:30:4"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 12:45:45"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 12:48:55"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 12:49:48"}
+{"level":"error","message":"Cannot set headers after they are sent to the client","timestamp":"2021-10-21 T 14:10:9"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 14:16:50"}
+{"level":"error","message":"Invalid status code: error: ","timestamp":"2021-10-21 T 14:20:53"}
+{"level":"error","message":"Invalid status code: error: ","timestamp":"2021-10-21 T 14:26:23"}
+{"level":"error","message":"Invalid status code: error: ","timestamp":"2021-10-21 T 14:27:32"}
+{"level":"error","message":"Invalid status code: error: ","timestamp":"2021-10-21 T 14:28:43"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 14:54:47"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 14:57:28.598"}
+{"level":"error","message":"Could not get the genres."}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 15:2:37.239"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 15:4:52.118"}
+{"level":"error","message":"Could not get the genres.","timestamp":"2021-10-21 T 15:7:40.456"}
+{"level":"error"}
+{"level":"error","timestamp":"2021-10-21 T 15:13:35.344"}
+{"level":"error","timestamp":"2021-10-21 T 15:14:35.440"}
+{"level":"error","timestamp":"2021-10-21 T 15:54:23.886"}
+{"level":"\u001b[31merror\u001b[39m","timestamp":"2021-10-21 T 15:55:10.922"}

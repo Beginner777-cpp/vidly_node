@@ -28,21 +28,22 @@ const app = express();
 //   process.exit(1);
 // })
 // winston.ExceptionHandler
-new winston.ExceptionHandler(
-  new winston.transports.File({filename: 'uncaughtException.log'})
+ winston.exceptions.handle(
+  new winston.transports.File({ filename: 'uncaughtException.log' })
 )
 
 process.on('unhandledRejection', (ex) => {
   // console.log("unhandledRejection");
-  winston.error(ex.message);
-  process.exit(1);
+  // winston.error(ex.message);
+  throw ex;
 
 })
 
 
 // winston.add(new winston.transports.File({ filename: 'logfile.log' }), { 'timestamp': true });
 function timezoned() {
-  return `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()} T ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
+  const date = new Date();
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} T ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`
 }
 winston.add(winston.createLogger({
   format: winston.format.combine(
@@ -57,17 +58,17 @@ winston.add(winston.createLogger({
     // - Write all logs with level `info` and below to `combined.log`
     //
     new winston.transports.File({ filename: 'logfile.log' }),
-
+    new winston.transports.MongoDB({ db: "mongodb://localhost:27017/vidly", options: { useNewUrlParser: true, useUnifiedTopology: true }, storeHost: true,
+    capped: true, })
   ],
 }));
 
-winston.add(new winston.transports.MongoDB({ db: "mongodb://localhost:27017/vidly", options: { useNewUrlParser: true, useUnifiedTopology: true } }))
+// winston.add(new winston.transports.MongoDB({ db: "mongodb://localhost:27017/vidly", options: { useNewUrlParser: true, useUnifiedTopology: true } }))
 
 
 // throw new Error('Something failed');
 
 // const p = Promise.reject(new Error('miserable error.'));
-
 // p.then(() => console.log('Done'))
 
 
@@ -75,6 +76,7 @@ if (!config.get('jwtPrivateKey')) {
   console.error('FATAL ERROR: jwtPrivateKey is not defined');
   process.exit(1);
 }
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
